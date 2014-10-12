@@ -13,44 +13,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pmaintcheck import util,plugin
-from pmaintcheck.plugin import Plugin
-
 from subprocess import check_output
 import re
 
-class GitTag(Plugin):
+def _cleanup_version(version):
+    # remove preceding strings
+    result = re.search("\d", version)
+    if result:
+        version_clean = version[result.start():].replace('_','.')
+    else:
+        return ''
 
-    def _cleanup_version(self, version):
-        # remove preceding strings
-        result = re.search("\d", version)
-        if result:
-            version_clean = version[result.start():].replace('_','.')
-        else:
-            return ''
+    # remove trailing strings
+    result = re.search("-", version_clean)
+    if result:
+        version_clean = version_clean[:result.start()]
 
-        # remove trailing strings
-        result = re.search("-", version_clean)
-        if result:
-            version_clean = version_clean[:result.start()]
+    return version_clean
 
-        return version_clean
+def get_version_list(plugin_arg):
+    version_list = []
 
-    def get_version_list(self, plugin_arg):
-        version_list = []
+    git_output = check_output(['git', 'ls-remote', '--tags', plugin_arg])
 
-        git_output = check_output(['git', 'ls-remote', '--tags', plugin_arg])
+    for git_line in git_output.splitlines():
+        sha1, tag = git_line.split()
 
-        for git_line in git_output.splitlines():
-            sha1, tag = git_line.split()
+        # eliminate duplicate tags that end with ^{}
+        if tag.endswith('^{}'):
+            continue
 
-            # eliminate duplicate tags that end with ^{}
-            if tag.endswith('^{}'):
-                continue
+        # remove /refs/tags/
+        version = tag[10:]
 
-            # remove /refs/tags/
-            version = tag[10:]
+        version_list.append(_cleanup_version(version))
 
-            version_list.append(self._cleanup_version(version))
-
-        return version_list
+    return version_list

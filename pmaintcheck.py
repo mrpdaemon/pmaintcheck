@@ -15,8 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pmaintcheck.util import compare_versions
-from pmaintcheck.gittag import GitTag
+from pmaintcheck import gittag,util
 
 config_file = open('example.cfg', 'r')
 
@@ -30,9 +29,8 @@ for config_line in config_file:
 
     print pkg_name + ': checking for updates...'
 
-    gittag = GitTag()
     version_list = gittag.get_version_list(plugin_arg)
 
     for version in version_list:
-        if compare_versions(last_version, version) > 0:
+        if util.compare_versions(last_version, version) > 0:
             print 'NEW VERSION: ' + version
