@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pmaintcheck import gittag,util
+from pmaintcheck import util
+
+import sys
 
 config_file = open('example.cfg', 'r')
 
@@ -29,7 +31,14 @@ for config_line in config_file:
 
     print pkg_name + ': checking for updates...'
 
-    version_list = gittag.get_version_list(plugin_arg)
+    # load the right plugin
+    try:
+        plugin = __import__('pmaintcheck.%s' % plugin_name, fromlist=['pmaintcheck'])
+    except ImportError:
+        print 'Plugin %s could not be loaded' % plugin_name
+        sys.exit(1)
+
+    version_list = plugin.get_version_list(plugin_arg)
 
     for version in version_list:
         if util.compare_versions(last_version, version) > 0:
