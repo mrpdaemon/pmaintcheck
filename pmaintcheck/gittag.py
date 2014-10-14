@@ -32,6 +32,7 @@ def _cleanup_version(version):
     return version_clean
 
 def get_version_list(plugin_arg):
+    """ Plugin arguments: repo-url"""
     version_list = []
 
     git_output = check_output(['git', 'ls-remote', '--tags', plugin_arg])
