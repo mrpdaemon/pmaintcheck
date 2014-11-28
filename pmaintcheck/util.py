@@ -25,9 +25,8 @@ def compare_versions(version1, version2):
         return 1
 
     # tokenize and compare each version atom
-    version1_atoms = version1.split('.')
-    version2_atoms = version2.split('.')
-    for version1_atom,version2_atom in zip(version1_atoms,version2_atoms):
+    for version1_atom,version2_atom in zip(version1.split('.'),
+                                           version2.split('.')):
         if int(version1_atom) > int(version2_atom):
             return -1
         elif int(version2_atom) > int(version1_atom):
