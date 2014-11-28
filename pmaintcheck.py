@@ -34,8 +34,8 @@ for config_line in config_file:
     # load the right plugin
     try:
         plugin = __import__('pmaintcheck.%s' % plugin_name, fromlist=['pmaintcheck'])
-    except ImportError:
-        print 'Plugin %s could not be loaded' % plugin_name
+    except ImportError as ie:
+        print 'Plugin %s could not be loaded: %s' % (plugin_name, ie)
         sys.exit(1)
 
     version_list = plugin.get_version_list(plugin_arg)
