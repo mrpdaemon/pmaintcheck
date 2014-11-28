@@ -40,6 +40,9 @@ for config_line in config_file:
 
     version_list = plugin.get_version_list(plugin_arg)
 
+    if not version_list:
+        print 'WARNING: No versions found!'
+
     for version in version_list:
         if util.compare_versions(last_version, version) > 0:
             print 'NEW VERSION: ' + version
