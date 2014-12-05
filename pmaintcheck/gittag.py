@@ -32,10 +32,15 @@ def _cleanup_version(version):
     return version_clean
 
 def get_version_list(plugin_arg):
-    """ Plugin arguments: repo-url"""
+    """ Plugin arguments: repo-url|ignore-versions
+        where ignore-versions is a comma separated list of tags to ignore
+    """
     version_list = []
 
-    git_output = check_output(['git', 'ls-remote', '--tags', plugin_arg])
+    repo_url, ignore_list = plugin_arg.split('|')
+    ignore_versions = ignore_list.split(',')
+
+    git_output = check_output(['git', 'ls-remote', '--tags', repo_url])
 
     for git_line in git_output.splitlines():
         sha1, tag = git_line.split()
@@ -44,9 +49,10 @@ def get_version_list(plugin_arg):
         if tag.endswith('^{}'):
             continue
 
-        # remove /refs/tags/
-        version = tag[10:]
+        # remove /refs/tags/ and clean up
+        version = _cleanup_version(tag[10:])
 
-        version_list.append(_cleanup_version(version))
+        if version not in ignore_versions:
+            version_list.append(version)
 
     return version_list
