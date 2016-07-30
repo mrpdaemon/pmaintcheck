@@ -25,8 +25,10 @@ def get_version_list(plugin_arg):
     version_list = []
 
     url, template = plugin_arg.split('|')
-
-    soup = BeautifulSoup(urllib2.urlopen(url).read())
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    request = urllib2.Request(url, headers=headers)
+    soup = BeautifulSoup(urllib2.urlopen(request).read())
+    print soup
 
     for link in soup.findAll('a', href=True):
 
