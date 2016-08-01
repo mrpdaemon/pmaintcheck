@@ -15,7 +15,23 @@
 
 from BeautifulSoup import BeautifulSoup
 
-import re, urllib2
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+from PyQt4.QtWebKit import *
+
+import re, urllib2, sys
+
+class Render(QWebPage):
+  def __init__(self, url):
+    self.app = QApplication(sys.argv)
+    QWebPage.__init__(self)
+    self.loadFinished.connect(self._loadFinished)
+    self.mainFrame().load(QUrl(url))
+    self.app.exec_()
+
+  def _loadFinished(self, result):
+    self.frame = self.mainFrame()
+    self.app.quit()
 
 def get_version_list(plugin_arg):
     """ Plugin arguments: URL|Template
@@ -25,9 +41,9 @@ def get_version_list(plugin_arg):
     version_list = []
 
     url, template = plugin_arg.split('|')
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    request = urllib2.Request(url, headers=headers)
-    soup = BeautifulSoup(urllib2.urlopen(request).read())
+
+    result = unicode(Render(url).frame.toHtml()).encode('utf-8')
+    soup = BeautifulSoup(result)
 
     for link in soup.findAll('a', href=True):
 
